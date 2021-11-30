@@ -5,17 +5,12 @@ The development of a smart contract-based application will come in layers. The a
 
 In general, the decentralized application will be able to execute the following functions:
 
-•	Track the flow of goods from material providers all the way to retailers
-  	
-    This step can be expanded to capture a broader network of participants operating at various tier levels. The complexity of the network is tentative for now. 
+•	Track the flow of goods from material providers all the way to retailers. This step can be expanded to capture a broader network of participants operating at various tier levels. The complexity of the network is tentative for now. 
 
-• Execute payments upon fulfilling conditions 
-    
-    Conditions can include, predetermined lead times, date of transaction, digital identity of the approver. 
-    
-    The transactions will be processed using Ether
+• Execute payments upon fulfilling conditions. Conditions can include, predetermined lead times, date of transaction, digital identity of the approver. The transactions will be processed using Ether.
 
 •	Keep an open ledger of transactions for parties to access
+
 
 The following are proposed elements of a supply chain based smart contract (these are subject to change)
 
