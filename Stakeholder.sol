@@ -10,17 +10,24 @@ This contract develops a database of the parties involved
 
 */
 
+// from track import x
+
 contract Stakeholder{
 /*
  Initialize mapping and struct to keep track of suppliers 
  Include constructor and modifier to assign admin and admin control 
 */
+    struct Supplier {
+        address  id;        // Ethereum address of the Supplier
+        string   name;      // Factory Name
+    }
 
     function addSupplier() {
         /*
         Use the initial supplier parameters to input supplier credentials
         Check that credentials are not null and are not double entries
         */
+        
     }
 
     function removeSupplier() {

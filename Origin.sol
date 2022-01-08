@@ -5,12 +5,14 @@ pragma solidity >=0.7.0 <0.9.0;
 /*
 This contract tracks the origin of the part and pertaining detail.
 Records producer details and allows parties involved to check the provenance of goods using a serial number or tags.
+PROVENENCE
 */
 
-contract origin {
-/* Variable declarataion & Modifiers/Constructors
-*/
+contract Origin {
+/* Variable declarataion & Modifiers/Constructors*/
   // Define enum 'State' with the following values:
+  // can change these/simplify
+
     enum State {
         ProducedByFactory,   
         ForSaleByFactory,        

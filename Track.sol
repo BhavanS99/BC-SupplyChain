@@ -11,7 +11,7 @@ by predetermined conditions. Input parameters from both parties need to match in
 be approved.
 */
 
-contract track{
+contract Track{
 /*
 Initialie variables and mappings; location, lead time and payment - these will be modified by the admin for each contract
 - define a structure to identify a shipment and a corresponding mapping (don't forget the tracking number for each product)
