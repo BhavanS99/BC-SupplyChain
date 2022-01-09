@@ -10,6 +10,7 @@ PROVENENCE
 
 contract Origin is Ownable{
 /* Variable declarataion & Modifiers/Constructors*/
+
   // Define enum 'State' with the following values:
     enum State {
         ProducedByFactory,   

@@ -1,10 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity >=0.7.0 <0.9.0;
-
-import "@openzeppelin/contracts/access/AccessControl.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
-
-
 /* 
 Allows parties to track shipments of goods and automatically execute payments 
 once the criteria is met.
@@ -13,6 +8,7 @@ The receiving party and the shipping party will input their information, which w
 by predetermined conditions. Input parameters from both parties need to match in order for transaction to 
 be approved.
 */  
+import "@openzeppelin/contracts/access/AccessControl.sol";
 
 contract Track is AccessControl {
     bytes32 public constant ADMN_ROLE = keccak256("ADMIN ROLE");
