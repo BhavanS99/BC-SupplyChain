@@ -8,7 +8,7 @@ Records producer details and allows parties involved to check the provenance of 
 PROVENENCE
 */
 
-contract Origin is Ownable{
+contract Origin is Ownable {
 /* Variable declarataion & Modifiers/Constructors*/
 
   // Define enum 'State' with the following values:
@@ -53,30 +53,6 @@ contract Origin is Ownable{
 - TODO: deterermine visibility and payability of functions
 - TODO: Setter/Getter methods 
 */
-
-    function addManufacturer() public onlyOwner {
-        //Link manufacturer credentials using the mappings/strcuts created above
-    }
-
-    function deleteManufacturer() public onlyOwner {
-        //Make sure only Admin address is capable of executing this
-    }
-
-    function findManufacturer() public onlyOwner {
-        //This function will let any user to pull out manufacturer details using their address
-        //Essentially, finding a user in a database
-    }
-
-    /*
-    The following functions are product specific and are similar to the manufacturer specific functions
-    */
-    function addProduct() public onlyOwner {
-
-    }
-
-    function removeProduct() public onlyOwner {
-
-    }
 
     function findProduct() public onlyOwner {
 

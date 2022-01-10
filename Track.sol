@@ -14,7 +14,6 @@ contract Track is AccessControl {
     bytes32 public constant ADMN_ROLE = keccak256("ADMIN ROLE");
     bytes32 public constant MNFC_ROLE = keccak256("MANUFACTURER ROLE");
     bytes32 public constant PROD_ROLE = keccak256("PRODUCER ROLE");
-
 /*
 Initialie variables and mappings; location, lead time and payment - these will be modified by the admin for each contract
 - define a structure to identify a shipment and a corresponding mapping (don't forget the tracking number for each product)
@@ -23,14 +22,14 @@ Initialie variables and mappings; location, lead time and payment - these will b
 - Events need to be triggered anytime a state change is made (i.e: successful shipment, payment etc.)
 */
 
-    function sendFunds() {
+    function sendFunds() public payable {
         /*
             Require that the amount being send is greater than the outstanding balance in the sender's account.
             if the condition is met update the balances of the sender and the reciever and trigger an event stating that the payment is complete
         */
     }
 
-    function balance(){
+    function balance() {
         /*
             simple function that allows you to look up an adress and return the balance tied to that account
         */

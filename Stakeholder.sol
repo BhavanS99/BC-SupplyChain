@@ -5,6 +5,8 @@ This contract develops a database of the parties involved
 - Works in conjunction with Track smart contract 
 - Call tracking contract at its deployed address
 
+- Recall : each line costs ETH in gas, so try to simplify
+
 */
 contract Stakeholder {
 /*
@@ -14,34 +16,37 @@ contract Stakeholder {
  The Stakeholder : owns the pencil distrbution, and can choose whether 
  or not to use the same wallet address.
 
- The Supplier   : assembles pencils (1 wood + 1 graphite + 1 eraser)
+ The Supplier    : assembles pencils (1 wood + 1 graphite + 1 eraser)
 */
     // define the properties of the stakeholder
-
     address public _owner;
     string  public _name;
-    mapping (address => Supplier) public suppliers;
+    mapping (address => supplier) public suppliers;  //  List of pencil suppliers
+    mapping (address => bytes32 ) public parties;    // Stores ranks for involved parties
+    
+    // QMIND dev function:
+    mapping (uint8 => string) public UPC_CODES;
 
-    struct Supplier {
-        // Supplier : struct 
-        //          : This is the user who sells compiled pencils
-
-        // Define a supplier 
-        address  id; // ETH address of supplier
-        string name; // name of this supplier
-        uint256 upc; // what does this supplier make?
-        // theres probably many more fields we will need...
+    struct supplier {
+        // Struct : Company that sells compiled pencils
+        address  _id;                               // ETH address of supplier
+        string _name;                               // name of this supplier
+        uint8 _upc;                                 // what does this supplier make?
     }
 
-    struct Manufacturer {
-        address  id; // ETH address of supplier
-        string name; // name of this supplier
-        uint256 upc; // what does this supplier make? 
-        // role manufacturer
-        // theres probably many more fields we will need...
+    struct manufacturer {
+        // Struct : Factory/Farm that produces parts
+        address _id;                                 // ETH address of manufacturer
+        string _name;                                 // name of this manufacturer
+        string _location;                             // location 
+        uint8 _upc;                                   // what does this manufacturer make? 
+        // there no need to hold a rank like manufacturer
+        // in this struct, since the contract who called the
+        // constructor keeps a list
     }
 
     constructor(string memory name) {
+        // Create a new Stakeholder 
         _owner = (msg.sender);
         _name = name;
     }
@@ -62,13 +67,13 @@ contract Stakeholder {
         //Delete supplier data - admin only
     }
 
-    function findSupplier(address x) public view returns (Supplier memory) {
+    function findSupplier(address s) public view returns (supplier) {
         // Return supplier details based on an address input
         // return suppliers[address]
-        return suppliers[x];
+        return suppliers[s];
     }
 
-    function addManufacturer() public onlyOwner {
+    function addManufacturer(string memory name, uint256 upc) public view onlyOwner {
         //Link manufacturer credentials using the mappings/strcuts created above
     }
 
@@ -105,5 +110,5 @@ contract Stakeholder {
     */
     }
 
-    
+
 }
