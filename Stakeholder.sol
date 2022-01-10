@@ -9,16 +9,36 @@ This contract develops a database of the parties involved
 contract Stakeholder {
 /*
  Initialize mapping and struct to keep track of suppliers 
- Include constructor and modifier to assign admin and admin control 
+ Include constructor and modifier to assign admin and admin control
+
+ The Stakeholder : owns the pencil distrbution, and can choose whether 
+ or not to use the same wallet address.
+
+ The Supplier   : assembles pencils (1 wood + 1 graphite + 1 eraser)
 */
-    address private _owner;
-    string  private _name;
+    // define the properties of the stakeholder
+
+    address public _owner;
+    string  public _name;
     mapping (address => Supplier) public suppliers;
 
     struct Supplier {
+        // Supplier : struct 
+        //          : This is the user who sells compiled pencils
+
+        // Define a supplier 
         address  id; // ETH address of supplier
-        string name; // name of this   supplier
+        string name; // name of this supplier
         uint256 upc; // what does this supplier make?
+        // theres probably many more fields we will need...
+    }
+
+    struct Manufacturer {
+        address  id; // ETH address of supplier
+        string name; // name of this supplier
+        uint256 upc; // what does this supplier make? 
+        // role manufacturer
+        // theres probably many more fields we will need...
     }
 
     constructor(string memory name) {
@@ -48,6 +68,30 @@ contract Stakeholder {
         return suppliers[x];
     }
 
+    function addManufacturer() public onlyOwner {
+        //Link manufacturer credentials using the mappings/strcuts created above
+    }
+
+    function deleteManufacturer() public onlyOwner {
+        //Make sure only Admin address is capable of executing this
+    }
+
+    function findManufacturer() public onlyOwner {
+        //This function will let any user to pull out manufacturer details using their address
+        //Essentially, finding a user in a database
+    }
+
+    /*
+    The following functions are product specific and are similar to the manufacturer specific functions
+    */
+    function addProduct() public onlyOwner {
+
+    }
+
+    function removeProduct() public onlyOwner {
+
+    }
+
     function fullList() public {
     /* This is an optional feature that can be included by 
     tracking all suppliers in an array and displaying a full list when this function is called 
@@ -60,4 +104,6 @@ contract Stakeholder {
     temporarily store all the addresses to be returned
     */
     }
+
+    
 }
