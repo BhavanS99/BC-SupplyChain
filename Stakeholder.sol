@@ -7,6 +7,7 @@ This contract develops a database of the parties involved
 - Call tracking contract at its deployed address
 */
 
+// imports
 import "./Origin.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 
@@ -16,14 +17,16 @@ contract Stakeholder is AccessControl {
  Include constructor and modifier to assign admin and admin control
 */
     // define contract roles
-    bytes32 public constant ADMN_ROLE = keccak256("ADMIN ROLE");
+    bytes32 public constant OWNR_ROLE = keccak256("ADMIN ROLE");
     bytes32 public constant MNFC_ROLE = keccak256("MANUFACTURER ROLE");
 
     // define the properties of the stakeholder
     address public _owner;
     string  public _name;
-    mapping (address => manufacturer) public manufacturers;  //  List of manufacturers
-    mapping (address => bytes32 ) public parties;    // Stores ranks for involved parties
+    mapping (address => manufacturer) public _manufacturers;  //  List of manufacturers
+    mapping (address => bytes32) public _parties;    // Stores ranks for involved parties
+    
+    // todo:  make a struct to store the completed pencils
     
     // QMIND dev function:
     mapping (uint8 => string) public UPC_CODES;
@@ -33,21 +36,33 @@ contract Stakeholder is AccessControl {
         address _id;                                  // ETH address of manufacturer
         string _name;                                 // name of this manufacturer
         string _location;                             // location 
-        uint8 _upc;                                   // what does this manufacturer make? 
+        uint8 _upc;                                // what does this manufacturer make? 
+        Origin.Item[] _items;
         // there no need to hold a rank like manufacturer
         // in this struct, since the contract who called the
         // constructor keeps a list
+    }
+
+    struct Item {
+        uint     sku;                    // SKU is item ID
+        uint     upc;                    // UPC is item type, ex 2 = rubber, 3 = wood
+        uint     originProduceDate;      // Date item produced in factory
+        string   itemName;
+        uint     productPrice;           // Product Price
+        address  manufacID;          // Ethereum address of the Distributor
+    
     }
 
     constructor(string memory name){
         // Create a new Stakeholder 
         _owner = msg.sender;
         _name = name;
+        _setupRole(OWNR_ROLE, msg.sender);
     }
 
     modifier onlyOwner() {
         // make function callable only by admin
-        require(hasRole(ADMN_ROLE, msg.sender));
+        require(hasRole(OWNR_ROLE, msg.sender));
         _;
     }
 
@@ -76,22 +91,22 @@ contract Stakeholder is AccessControl {
     }
     */
 
-    function addManufacturer(string memory name, string memory loc, uint8 upc) public onlyOwner {
+    function addManufacturer (string memory name, string memory loc, uint8 upc) public onlyOwner {
         //Link manufacturer credentials using the mappings/strcuts created above
         manufacturer memory x = manufacturer(msg.sender, name, loc, upc);
-        manufacturers[msg.sender] = x;
+        _manufacturers[msg.sender] = x;
         grantRole(MNFC_ROLE, msg.sender);
     }
 
     function deleteManufacturer(address x) public onlyOwner {
         //Make sure only Admin address is capable of executing this
         revokeRole(MNFC_ROLE, x);
-        delete manufacturers[x];
+        delete _manufacturers[x];
     }
 
-    function findManufacturer(address s) public onlyOwner view returns (manufacturer memory) {
+    function findManufacturer(address s) public view returns (manufacturer memory) {
         //This function will let any user to pull out manufacturer details using their address
-        return manufacturers[s];
+        return _manufacturers[s];
     }
 
     /*
@@ -99,16 +114,12 @@ contract Stakeholder is AccessControl {
     */
     function addProduct() public onlyMnfc {
         // 1) construct an Origin.Item object
-        // 2) add it to the mapping
-    }
-
-    function removeProduct() public onlyMnfc {
-        // 1) delete from mapping
+        // 2) add to msg.sender's array
     }
 
     function fullList() public {
     /* This is an optional feature that can be included by 
-    tracking all suppliers in an array and displaying a full list when this function is called 
+    tracking all manufacturers in an array and displaying a full list when this function is called 
     */
     // https://ethereum.stackexchange.com/questions/65589/return-a-mapping-in-a-getall-function
     }
@@ -122,4 +133,27 @@ contract Stakeholder is AccessControl {
     }
 
 
+
+    /** Best practice security wise 
+            - public function calls internal function
+
+
+
+        /// Define a public function to transfer ownership
+        function transferOwnership(address newOwner) public onlyOwner {
+            _transferOwnership(newOwner);
+    }
+
+        /// Define an internal function to transfer ownership
+        function _transferOwnership(address newOwner) internal {
+            require(newOwner != address(0));
+            emit TransferOwnership(origOwner, newOwner);
+            origOwner = newOwner;
+    }
+}
+     */
+
+     // TODO :
+     // combine into pencil functionality
+     // 
 }
