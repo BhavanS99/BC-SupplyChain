@@ -12,6 +12,21 @@ import "./Stakeholder.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 
 contract Track is AccessControl {
+    bytes32 public constant OWNR_ROLE = keccak256("ADMIN ROLE");
+    bytes32 public constant MNFC_ROLE = keccak256("MANUFACTURER ROLE");
+    bytes32 public constant ASMB_ROLE = keccak256("ASSEMBLER ROLE");
+
+
+   modifier onlyOwner() {
+        // make function callable only by admin
+        require(hasRole(OWNR_ROLE, msg.sender));
+        _;
+    }
+
+    modifier onlyMnfc() {
+        require(hasRole(MNFC_ROLE, msg.sender));
+        _;
+    }
     // import roles from another stakeholder contract
     address _admin;
     // add contract params from setContactParams
@@ -43,7 +58,7 @@ Initialie variables and mappings; location, lead time and payment - these will b
             if the condition is met update the balances of the sender and the reciever and trigger an event stating that the payment is complete
         */
 
-
+        // bh
     }
 
     function balance() {
@@ -67,6 +82,8 @@ Initialie variables and mappings; location, lead time and payment - these will b
 
         // 2) Set these params
         // 3) return done / true;
+
+        // andr
     }
 
     function sendShipment(){
@@ -88,7 +105,7 @@ Initialie variables and mappings; location, lead time and payment - these will b
 
          // 4) return status? always true idk,
 
-
+        // andr
     }
 
     function receiveShipment(){

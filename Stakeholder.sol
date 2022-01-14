@@ -19,6 +19,7 @@ contract Stakeholder is AccessControl {
     // define contract roles
     bytes32 public constant OWNR_ROLE = keccak256("ADMIN ROLE");
     bytes32 public constant MNFC_ROLE = keccak256("MANUFACTURER ROLE");
+    bytes32 public constant ASMB_ROLE = keccak256("ASSEMBLER ROLE");
 
     // define the properties of the stakeholder
     address public _owner;
@@ -115,12 +116,14 @@ contract Stakeholder is AccessControl {
     function addProduct() public onlyMnfc {
         // 1) construct an Origin.Item object
         // 2) add to msg.sender's array
+        // mit and mitc
     }
 
     function fullList() public {
     /* This is an optional feature that can be included by 
     tracking all manufacturers in an array and displaying a full list when this function is called 
     */
+    // mit and mitc
     // https://ethereum.stackexchange.com/questions/65589/return-a-mapping-in-a-getall-function
     }
 
@@ -129,6 +132,7 @@ contract Stakeholder is AccessControl {
     You will need to loop through checking the goodtype to see if it matches the user entry and 
     temporarily store all the addresses to be returned
     */
+    // mit and mitc
     // https://ethereum.stackexchange.com/questions/65589/return-a-mapping-in-a-getall-function
     }
 
