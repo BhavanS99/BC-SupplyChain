@@ -51,14 +51,25 @@ Initialie variables and mappings; location, lead time and payment - these will b
     // TODO:
     // EVENTS for fail,success, payment
 
+    mapping(address => uint256) public accounts;
+    uint leadTime; //units - seconds 
+    uint costOfShipment; //units - ETH
+    address owner;
     
-    function sendFunds() public payable {
-        /*
-            Require that the amount being send is greater than the outstanding balance in the sender's account.
-            if the condition is met update the balances of the sender and the reciever and trigger an event stating that the payment is complete
-        */
-
-        // bh
+    //The following function funds the contract - contract becomes the owner of the funds
+    
+    function fundContract() public payable {
+        accounts[msg.sender] += msg.value;
+    }
+    
+    //The following function transfers funds from the contract to the payee
+    
+    function sendFunds(address payable _payee, uint256 _amount) public payable returns (bool success) {
+        require(accounts[msg.sender] >= _amount,"Insufficient Funds"); 
+        accounts[msg.sender] -= _amount;
+        accounts[_payee] += _amount; 
+        _payee.transfer(_amount);
+        return true;
     }
 
     function balance() {
@@ -68,24 +79,15 @@ Initialie variables and mappings; location, lead time and payment - these will b
         // how to check balance of token x in an eth wallet
     }
 
-
-    function contractParam(){
-        /* 
-            This is where all the contract conditions will be set for the next leg of shipment
-            - location, time, payment amount (these are initialized at the start of the contract and are modified when contract is executed)
-        ***Think about other variables we can include to improve the integrity of approving shipments
-        */
-
-        // 1) Params:
-        //      - cost of shipment
-        //      - leadTime
-
-        // 2) Set these params
-        // 3) return done / true;
-
-        // andr
+    // Set contract conditions for a successful shipment
+    
+    function contractParam(uint _leadTime, uint _costOfShipment) onlyOwner public returns(bool success) {
+            leadTime = _leadTime; //acceptable lead time for the next shipment 
+            costOfShipment = _costOfShipment; //payment amount for the next shipment
+            return true;
     }
-
+    
+    
     function sendShipment(){
         /*
             Use the parameters passed into the function to update the shipments mapping
