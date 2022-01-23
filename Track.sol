@@ -7,29 +7,69 @@ once the criteria is met.
 The receiving party and the shipping party will input their information, which will get verified 
 by predetermined conditions. Input parameters from both parties need to match in order for transaction to 
 be approved.
+
+/* 
+#################################################################
+###                                                           ###
+###                       QMIND 2021                          ###
+###               BC-SUPPLYCHAIN : ETHEREUM                   ###
+###                                                           ###
+###   Track shipments of goods and automatically execute      ###
+###   payments if contract criteria is satisfied.             ###
+###                                                           ###
+###   The receiving party and the shipping party will input   ###
+###   their impformation which should match the expected      ###
+###   fields. A matching set of details confirms              ###
+###   the transaction.                                        ###
+###                                                           ###
+#################################################################
+
+PHASE 1 DEADLINE : January 27th  2022
+
+UPC {
+    wood : 1
+    graphite : 2
+    rubber : 3
+}
+
+*/
+
+
 */  
 import "./Stakeholder.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 
 contract Track is AccessControl {
+
     bytes32 public constant OWNR_ROLE = keccak256("ADMIN ROLE");
     bytes32 public constant MNFC_ROLE = keccak256("MANUFACTURER ROLE");
     bytes32 public constant ASMB_ROLE = keccak256("ASSEMBLER ROLE");
 
+    // define contract variables
+    address public _admin;
+    uint public contractLeadTime;                     // time period from shipment to delivery for a succesful excecution, in seconds
+    uint public contractPayment;                      // payment for sucessful excecution, in ETH
+    uint leadTime;                                    // unit - seconds 
+    uint costOfShipment;                              // unit - ETH
+    mapping(string => Shipment) public shipments;     // not sure about this data structure
+    mapping(address => uint256) public accounts;      // list of accounts ?
 
-   modifier onlyOwner() {
+    // define events
+    event Success(string _message, string _trackingNo, uint _timeStamp, address _sender);
+    event Failure(string _message);
+
+
+    modifier onlyOwner() {
         // make function callable only by admin
         require(hasRole(OWNR_ROLE, msg.sender));
         _;
     }
 
     modifier onlyMnfc() {
+        // make function callable only by manufacturer
         require(hasRole(MNFC_ROLE, msg.sender));
         _;
     }
-    // import roles from another stakeholder contract
-    address _admin;
-    // add contract params from setContactParams
 
     struct Shipment {
         string item;
@@ -40,9 +80,7 @@ contract Track is AccessControl {
     }
     
 /*
-Initialie variables and mappings; location, lead time and payment - these will be modified by the admin for each contract
-- define a structure to identify a shipment and a corresponding mapping (don't forget the tracking number for each product)
-- define a mapping to track account balances
+
 
 - Events need to be triggered anytime a state change is made (i.e: successful shipment, payment etc.)
 
@@ -51,17 +89,23 @@ Initialie variables and mappings; location, lead time and payment - these will b
     // TODO:
     // EVENTS for fail,success, payment
 
+    //The following function funds the contract - contract becomes the owner of the funds
     
-    function sendFunds() public payable {
-        /*
-            Require that the amount being send is greater than the outstanding balance in the sender's account.
-            if the condition is met update the balances of the sender and the reciever and trigger an event stating that the payment is complete
-        */
-
-        // bh
+    function fundContract() public payable {
+        accounts[msg.sender] += msg.value;
     }
 
-    function balance() {
+    //The following function transfers funds from the contract to the payee
+    
+    function sendFunds(address payable _payee, uint256 _amount) public payable returns (bool success) {
+        require(accounts[msg.sender] >= _amount,"Insufficient Funds"); 
+        accounts[msg.sender] -= _amount;
+        accounts[_payee] += _amount; 
+        _payee.transfer(_amount);
+        return true;
+    }
+
+    function balance() public {
         /*
             simple function that allows you to look up an adress and return the balance tied to that account
         */
@@ -69,69 +113,55 @@ Initialie variables and mappings; location, lead time and payment - these will b
     }
 
 
-    function contractParam(){
-        /* 
+    function contractParam(uint _leadTime, uint _payment) public onlyOwner returns (bool success){
+        /*
             This is where all the contract conditions will be set for the next leg of shipment
             - location, time, payment amount (these are initialized at the start of the contract and are modified when contract is executed)
         ***Think about other variables we can include to improve the integrity of approving shipments
-        */
-
-        // 1) Params:
-        //      - cost of shipment
-        //      - leadTime
-
-        // 2) Set these params
-        // 3) return done / true;
-
-        // andr
+        */        
+        
+        contractLeadTime = _leadTime; // set acceptable lead time
+        contractPayment = _payment; // set payment amount        
+        return true;
     }
 
-    function sendShipment(){
+    function sendShipment(string _trackingNo, uint _upc, uint _quantity) public onlyMnfc returns (bool success){
         /*
             Use the parameters passed into the function to update the shipments mapping
             - Remember each shipment is linked via a serial or tracking number
             - Trigger an event to indicate this state change
-        */    
-         // 1) params:
-         //     - trackingNo
-         //     - what item is it (UPC)
-         //     - quantity
-         //     perms: manufacturer
-         
-         // 2) for params in shipping struct:
-         //      fill out fields
-         
-         // 3) emit event
-
-         // 4) return status? always true idk,
-
-        // andr
+        */         
+        shipments[_trackingNo].item = _upc;
+        shipments[_trackingNo].quantity = _quantity;
+        shipments[_trackingNo].timeStamp = block.timestamp;
+        shipments[_trackingNo].sender = msg.sender;         
+        emit Success("Items Shipped", _trackingNo, block.timestamp, msg.sender);         
+        return true;
     }
 
-    function receiveShipment(){
+    function receiveShipment(string _trackingNo, uint _upc, uint _quantity) public onlyAsmb returns (bool success) {
         /*
-            Checking for the following conditions 
-                - Item [Tracking Number] and Quantity match the details from the sender 
+            Checking for the following conditions
+                - Item [Tracking Number] and Quantity match the details from the sender
                 - Once the above conditions are met, check if the location, shipping time and lead time (delay between when an order is placed and processed)
-                 match and call the sendFunds function 
+                 match and call the sendFunds function
                 - The above conditions can be applied as nested if statements and have events triggered within as each condition is met
-        */
-         // 1) params:
-         //     - trackingNo
-         //     - what item is it (UPC)
-         //     - quantity
-         //     
-         //     perms: assembler // stakeholder in this case
-
-         // 2) if trackingID = what we recieved as a tracking ID:
-        //          && expected_quantity == what we recieved as quantity
-        //    emit item recieved
-        
-        // 3) check if admin's critera are satisfied for a given shipment:
-        //    if yes then send ETH via sendFUnds()
-        //          regardless, emit status
-        
-        
+        */        //checking that the item and quantity received match the item and quantity shipped
+        if(shipments[_trackingNo].item == _upc && shipments[_trackingNo].quantity == _quantity) {
+            emit Success("Items received", _trackingNo, block.timestamp, msg.sender);            //checking that the items were shipped within the set lead time
+            if (block.timestamp <= shipments[_trackingNo].timeStamp + contractLeadTime) {
+                //checks have been passed, send tokens from the assmbler to the manufacturer                
+                //sendToken(admin, shipments[_trackingNo].sender, contractPayment);                //Trigger Payment event
+            }
+            else {
+                emit Failure("Payment not triggered as time criteria weas not met");
+            }
+            return true;
+        }
+        else {
+            emit Failure("Issue in item/quantity");
+            return false;
+        }
     }
 
     function deleteShipment(){
