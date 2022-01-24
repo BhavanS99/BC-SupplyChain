@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity >=0.7.0 <0.9.0;
+pragma experimental ABIEncoderV2;  
 /* 
 Allows parties to track shipments of goods and automatically execute payments 
 once the criteria is met.
@@ -13,6 +14,7 @@ be approved.
 ###                                                           ###
 ###                       QMIND 2021                          ###
 ###               BC-SUPPLYCHAIN : ETHEREUM                   ###
+###               CONTRACT       : TRACK                      ###
 ###                                                           ###
 ###   Track shipments of goods and automatically execute      ###
 ###   payments if contract criteria is satisfied.             ###
