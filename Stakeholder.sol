@@ -1,8 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity >=0.7.0 <0.9.0;
 pragma experimental ABIEncoderV2;   
-/* 
-#################################################################
+/*###############################################################
 ###                                                           ###
 ###                       QMIND 2021                          ###
 ###               BC-SUPPLYCHAIN : ETHEREUM                   ###
@@ -23,35 +22,28 @@ UPC {
 }
 
 */
+
 import "@openzeppelin/contracts/access/AccessControl.sol";
+import "./Roles.sol";
 
 contract Stakeholder is AccessControl {
-/*
- Initialize mapping and struct to keep track of suppliers 
- Include constructor and modifier to assign admin and admin control
-*/
-    // define contract roles
-    bytes32 public constant OWNR_ROLE = keccak256("ADMIN ROLE");
-    bytes32 public constant MNFC_ROLE = keccak256("MANUFACTURER ROLE");
-    bytes32 public constant ASMB_ROLE = keccak256("ASSEMBLER ROLE");
-    
     // define the properties of the stakeholder
     address public _owner;
     string  public _name;
     uint    private _sku_count;
-    mapping    (uint => item)         public _products;       // SKU -> Product, mapping for completed projects
+    mapping (uint => item)            public _products;       // SKU -> Product, mapping for completed products (pencils)
     mapping (address => bytes32)      public _parties;        // Stores ranks for involved parties
-    mapping (address => manufacturer) public _manufacturers;  //  List of manufacturers
+    mapping (address => manufacturer) public _manufacturers;  // List of manufacturers
+    mapping (uint => uint)            public _prices;         // UPC -> price
     
-
     struct manufacturer {
-        // Struct : Factory/Farm/Plant that produces a part(s)
-        address   _id;                                  // ETH address of manufacturer
-        string    _name;                                // name of this manufacturer
-        string    _location;                            // location 
-        uint8     _upc;                                 // what does this manufacturer make? 
-        // note, in the future, a manufacturer may use uint8[], indicating it can make different parts
-        item[]    _items;
+        // a manufacturer is a data structure representing
+        // a factory/assembler which creates a part
+        address   _id;                            // ETH address of manufacturer
+        string    _name;                          // name of this manufacturer
+        string    _location;                      // location 
+        uint8     _upc;                           // what does this manufacturer make? 
+        item[]    _items;                         // queue of completed items, FiFo 
     }
 
     struct item {
@@ -67,17 +59,17 @@ contract Stakeholder is AccessControl {
         // Create a new Stakeholder 
         _owner = msg.sender;
         _name = name;
-        _setupRole(OWNR_ROLE, msg.sender);
+        Roles._setupRole(Roles.OWNR_ROLE, msg.sender);
     }
 
     modifier onlyOwner() {
         // make function callable only by admin
-        require(hasRole(OWNR_ROLE, msg.sender));
+        require(hasRole(Roles.OWNR_ROLE, msg.sender));
         _;
     }
 
     modifier onlyMnfc() {
-        require(hasRole(MNFC_ROLE, msg.sender));
+        require(hasRole(Roles.MNFC_ROLE, msg.sender));
         _;
     }
 
@@ -105,12 +97,12 @@ contract Stakeholder is AccessControl {
         //Link manufacturer credentials using the mappings/strcuts created above
         manufacturer memory x = manufacturer(msg.sender, name, loc, upc);
         _manufacturers[msg.sender] = x;
-        grantRole(MNFC_ROLE, msg.sender);
+        Roles.grantRole(Roles.MNFC_ROLE, msg.sender);
     }
 
-    function deleteManufacturer(address x) public onlyOwner {
+    function deleteManufacturer(address x) public Roles.onlyOwner {
         //Make sure only Admin address is capable of executing this
-        revokeRole(MNFC_ROLE, x);
+        revokeRole(Roles.MNFC_ROLE, x);
         delete _manufacturers[x];
     }
 
@@ -187,7 +179,7 @@ contract Stakeholder is AccessControl {
     // https://ethereum.stackexchange.com/questions/65589/return-a-mapping-in-a-getall-function
     }
 
-    function filterGoods(string _goodsType) public view returns (address[] memory) {
+    function filterGoods(string upc) public view returns (address[] memory) {
     /* This function accepts a goodtype and returns all the addresses associated with that good
     You will need to loop through checking the goodtype to see if it matches the user entry and 
     temporarily store all the addresses to be returned
@@ -196,7 +188,7 @@ contract Stakeholder is AccessControl {
     // https://ethereum.stackexchange.com/questions/65589/return-a-mapping-in-a-getall-function
     address[] memory filterGoods = new address[](suppliersByAddress.length);
     for (uint i = 0; i < suppliersByAddress.length; i++) {
-        if (suppliers[suppliersByAddress[i]].goodsType == _goodsType) {
+        if (suppliers[suppliersByAddress[i]].goodsType == upc) {
             filterGoods[i] = suppliersByAddress[i];
             }
         return filterGoods;
