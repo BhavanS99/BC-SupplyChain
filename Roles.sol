@@ -13,6 +13,7 @@ import "@openzeppelin/contracts/access/AccessControl.sol";
 ###   contract                                                ###
 ###                                                           ###
 ###############################################################*/
+
 contract Roles is AccessControl {
     // setup permissions, roles for parties involved
     bytes32 public constant OWNR_ROLE = keccak256("ADMIN ROLE");
