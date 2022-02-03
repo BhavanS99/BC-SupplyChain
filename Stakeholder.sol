@@ -47,10 +47,9 @@ contract Stakeholder is AccessControl {
         address  manufacID;              // Ethereum address of the Distributor
     }
 
-    constructor(string memory name) {
+    constructor() {
         // Create a new Stakeholder 
         _owner = msg.sender;
-        _name = name;
         // Setup permissions for the contract
         _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
         _setRoleAdmin(OWNR_ROLE, DEFAULT_ADMIN_ROLE);
@@ -71,25 +70,36 @@ contract Stakeholder is AccessControl {
         _;
     }
 
-    function addManufacturer(address mfc, string memory name, string memory loc, uint8 upc) public onlyOwner {
+    function addManufacturer(
+        address mfc, 
+        string calldata name, 
+        string calldata loc, 
+        uint8 upc
+        ) public onlyOwner {
         // Link manufacturer credentials using the mappings/strcuts created above
         manufacturer memory x = manufacturer(mfc, name, loc, upc);
         _manufacturers[mfc] = x;
         grantRole(MNFC_ROLE, mfc);
     }
 
-    function deleteManufacturer(address x) public onlyOwner {
+    function deleteManufacturer(
+        address x
+        ) public onlyOwner {
         // Make sure only Admin address is capable of executing this
         revokeRole(MNFC_ROLE, x);
         delete _manufacturers[x];
     }
 
-    function findManufacturer(address s) public view returns (manufacturer memory) {
+    function findManufacturer(
+        address s
+        ) public view returns (manufacturer memory) {
         // This function will let any user to pull out manufacturer details using their address
         return _manufacturers[s];
     }
 
-    function getPrice(uint upc) public view returns (uint price) {
+    function getPrice(
+        uint upc
+        ) public view returns (uint price) {
         // Fetch the price of a product given a UPC
         return _products[upc].productPrice;
     }
@@ -97,7 +107,9 @@ contract Stakeholder is AccessControl {
     function addProduct(
         uint originProduceDate,
         uint productPrice,
-        uint upc) public onlyMnfc returns (bool suceess) {
+        uint upc,
+        string calldata name
+        ) public onlyMnfc returns (bool suceess) {
         // 1) construct an Origin.Item object
         // 2) add to msg.sender's array
         // mit and mitc
@@ -106,7 +118,7 @@ contract Stakeholder is AccessControl {
             _products[sku].upc = upc;
             _products[sku].originProduceDate = originProduceDate;
             _products[sku].productPrice = productPrice;
-            _products[sku].itemName = "what";
+            _products[sku].itemName = name;
             _sku_count++;
             return true;
         }

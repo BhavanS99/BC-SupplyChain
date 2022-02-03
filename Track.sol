@@ -20,7 +20,6 @@ import "@openzeppelin/contracts/access/AccessControl.sol";
 ###                                                           ###
 ###############################################################*/
 
-//PHASE 1 DEADLINE : January 27th  2022
 
 contract Track is AccessControl {
 
@@ -70,10 +69,11 @@ contract Track is AccessControl {
     }
 
     
-    function sendFunds(address payable payee, uint256 amount) public payable returns (bool success) {
+    function sendFunds(
+        address payable payee, 
+        uint256 amount
+        ) public payable returns (bool success) {
         //The following function transfers funds from the contract to the payee
-
-        // make sure account has sufficient funding
         require(_accounts[msg.sender] >= amount, "Insufficient Funds"); 
         // move funds
         _accounts[msg.sender] -= amount;
@@ -84,26 +84,37 @@ contract Track is AccessControl {
         return true;
     }
 
-    function contractParam(uint leadTime, uint payment) public onlyOwner returns (bool success){
+    function contractParam(
+        uint leadTime, 
+        uint payment
+        ) public onlyOwner returns (bool success){
         // Define shipment constraints, specified by the owner     
-        _contractLeadTime = leadTime; // set acceptable lead time
-        _contractPayment = payment;   // set payment amount        
+        _contractLeadTime = leadTime;  // set acceptable lead time
+        _contractPayment  = payment;   // set payment amount        
         return true;
     }
 
-    function sendShipment(uint trackingNo, uint upc, uint quantity) public payable onlyMnfc returns (bool success){
+    function sendShipment(
+        uint trackingNo, 
+        uint upc, 
+        uint quantity
+        ) public payable onlyMnfc returns (bool success){
         // Function for manufacturer to send a shipment of _quanity number of _upc
         // Fill out shipment struct for a given tracking number
-        _shipments[trackingNo].upc = upc;
-        _shipments[trackingNo].sender  =  payable(msg.sender);
-        _shipments[trackingNo].quantity = quantity;
+        _shipments[trackingNo].upc       = upc;
+        _shipments[trackingNo].sender    = payable(msg.sender);
+        _shipments[trackingNo].quantity  = quantity;
         _shipments[trackingNo].timeStamp = block.timestamp;
         // emit successful event
         emit Success("Items Shipped", trackingNo, block.timestamp, msg.sender);
         return true;
     }
 
-    function receiveShipment(uint trackingNo, uint upc, uint quantity) public payable onlyAsmb returns (bool success) {
+    function receiveShipment(
+        uint trackingNo, 
+        uint upc, 
+        uint quantity
+        ) public payable onlyAsmb returns (bool success) {
         /*
             Checking for the following conditions
                 - Item [Tracking Number] and Quantity match the details from the sender
